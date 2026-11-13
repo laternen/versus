@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#07080D">
+<title>Киноверсус — баттл фильмов и сериалов</title>
+<meta name="description" content="Выбирай любимое из двух карточек, пока на ринге не останется один чемпион.">
+<meta property="og:title" content="Киноверсус">
+<meta property="og:description" content="Баттл фильмов и сериалов: кто твой чемпион?">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%2307080D'/%3E%3Ccircle cx='24' cy='32' r='12' fill='none' stroke='%2322E5FF' stroke-width='4'/%3E%3Ccircle cx='40' cy='32' r='12' fill='none' stroke='%23FF3DDA' stroke-width='4'/%3E%3C/svg%3E">
+<link rel="preload" href="fonts/manrope-cyrillic-800-normal.woff2" as="font" type="font/woff2" crossorigin>
+<style>@font-face{font-family:Manrope;font-weight:400;font-display:swap;src:url(fonts/manrope-cyrillic-400-normal.woff2) format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:Manrope;font-weight:400;font-display:swap;src:url(fonts/manrope-latin-400-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:Manrope;font-weight:600;font-display:swap;src:url(fonts/manrope-cyrillic-600-normal.woff2) format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:Manrope;font-weight:600;font-display:swap;src:url(fonts/manrope-latin-600-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:Manrope;font-weight:800;font-display:swap;src:url(fonts/manrope-cyrillic-800-normal.woff2) format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:Manrope;font-weight:800;font-display:swap;src:url(fonts/manrope-latin-800-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+
+/* ---------- токены ---------- */
+:root{
+  --bg:#07080D;
+  --surface:#0E1017;
+  --line:#23263A;
+  --text:#EEF0F8;
+  --muted:#8B90A8;
+  --cyan:#22E5FF;
+  --pink:#FF3DDA;
+  --font:Manrope,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{
+  background:var(--bg);color:var(--text);font-family:var(--font);font-weight:400;
+  -webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%;
+  overflow:hidden;user-select:none;-webkit-user-select:none;
+}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;padding:0;touch-action:manipulation}
+button:focus-visible,a:focus-visible{outline:2px solid var(--text);outline-offset:3px}
+[hidden]{display:none!important}
+
+#app{
+  position:relative;height:100dvh;
+  background:
+    radial-gradient(60% 38% at 0% 0%,rgba(34,229,255,.16),transparent 70%),
+    radial-gradient(60% 38% at 100% 100%,rgba(255,61,218,.16),transparent 70%),
+    var(--bg);
+}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;width:100%;max-width:760px;margin:0 auto}
+
+/* ---------- общие детали ---------- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  background:rgba(34,229,255,.08);color:var(--cyan);font-weight:600;font-size:17px;letter-spacing:.02em;
+  padding:16px 30px;border:1.5px solid var(--cyan);border-radius:14px;text-decoration:none;
+  box-shadow:0 0 18px rgba(34,229,255,.35),inset 0 0 14px rgba(34,229,255,.12);
+  text-shadow:0 0 10px rgba(34,229,255,.6);transition:transform .1s,box-shadow .2s,background .2s;
+}
+.btn:active{transform:scale(.97);background:rgba(34,229,255,.18)}
+.vs{
+  position:absolute;left:50%;top:50%;z-index:5;width:52px;height:52px;margin:-26px 0 0 -26px;
+  display:grid;place-items:center;border-radius:50%;background:var(--bg);color:var(--text);
+  border:1px solid var(--line);font-weight:800;font-size:14px;letter-spacing:.06em;pointer-events:none;
+  box-shadow:0 0 0 6px var(--bg),0 0 18px rgba(255,255,255,.12);
+}
+
+/* ---------- старт ---------- */
+#screen-start{justify-content:center;align-items:center;padding:24px 24px calc(24px + env(safe-area-inset-bottom));text-align:center}
+.logo{width:100%;font-weight:800;line-height:1;letter-spacing:.02em;font-size:min(15vw,84px)}
+.logo span{display:block}
+.logo .k{color:#EAFDFF;text-shadow:0 0 6px rgba(34,229,255,.9),0 0 22px rgba(34,229,255,.7),0 0 50px rgba(34,229,255,.45)}
+.logo .v{margin-top:.12em;color:#FFEAFB;text-shadow:0 0 6px rgba(255,61,218,.9),0 0 22px rgba(255,61,218,.7),0 0 50px rgba(255,61,218,.45)}
+.logo{animation:flicker 1.1s steps(1,end) .1s both}
+@keyframes flicker{0%{opacity:0}8%{opacity:1}12%{opacity:.3}18%{opacity:1}24%{opacity:.5}30%,100%{opacity:1}}
+.rules{margin:44px 0 34px;max-width:340px;color:var(--muted);font-size:16px;line-height:1.5}
+.rules p+p{margin-top:10px}
+.rules b{color:var(--text);font-weight:600}
+.start-note{margin-top:20px;font-size:14px;color:var(--muted)}
+
+/* ---------- баттл ---------- */
+.hud{
+  position:relative;z-index:6;flex:none;display:flex;align-items:center;justify-content:space-between;
+  padding:calc(12px + env(safe-area-inset-top)) 18px 14px;
+}
+.hud .brand{font-weight:800;font-size:14px;letter-spacing:.14em}
+.hud .round{font-weight:600;font-size:14px;color:var(--muted);letter-spacing:.04em}
+.hud .bar{position:absolute;left:18px;right:18px;bottom:0;height:2px;background:var(--line);border-radius:2px}
+.hud .bar i{display:block;height:100%;width:0;border-radius:2px;background:linear-gradient(90deg,var(--cyan),var(--pink));box-shadow:0 0 8px rgba(34,229,255,.7);transition:width .35s}
+.ring{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;gap:28px;padding:18px 18px calc(16px + env(safe-area-inset-bottom))}
+.fighter{flex:1;min-height:0;display:flex;flex-direction:column;gap:12px;--c:var(--cyan);--glow:rgba(34,229,255,.55)}
+.fighter.r{--c:var(--pink);--glow:rgba(255,61,218,.55)}
+.card{flex:1;min-height:0;display:flex;gap:18px;align-items:stretch;text-align:left;width:100%;-webkit-appearance:none}
+.fighter.r .card{flex-direction:row-reverse}
+.poster{
+  position:relative;flex:none;height:100%;aspect-ratio:2/3;max-width:56%;
+  background:var(--surface);border:1.5px solid var(--c);border-radius:12px;overflow:hidden;
+  box-shadow:0 0 22px var(--glow),0 0 2px var(--c);
+}
+.poster .ph{
+  position:absolute;inset:0;display:flex;align-items:flex-end;padding:12px;
+  font-weight:600;font-size:13px;line-height:1.2;color:var(--muted);background:var(--surface);
+}
+.poster img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .25s}
+.poster img.on{opacity:1}
+.info{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:8px}
+.years{font-weight:600;font-size:14px;letter-spacing:.06em;color:var(--c);text-shadow:0 0 10px var(--glow)}
+.title{
+  font-weight:800;font-size:clamp(20px,5.7vw,32px);line-height:1.15;letter-spacing:-.015em;
+  display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:break-word;hyphens:auto;
+}
+.meta{font-size:14px;line-height:1.4;color:var(--muted)}
+.skip{
+  align-self:flex-start;font-weight:600;font-size:14px;color:var(--muted);
+  padding:9px 16px;border:1px solid var(--line);border-radius:999px;transition:color .15s,border-color .15s,transform .1s;
+}
+.fighter.r .skip{align-self:flex-end}
+.skip.off{visibility:hidden}
+.skip:hover{color:var(--text);border-color:var(--muted)}
+.skip:active{transform:scale(.96)}
+
+/* анимации карточек */
+.card.in-l{animation:inL .42s cubic-bezier(.2,.9,.3,1) both}
+.card.in-r{animation:inR .42s cubic-bezier(.2,.9,.3,1) both}
+.card.win{animation:win .45s ease forwards}
+.card.lose-l{animation:loseL .4s ease-in forwards}
+.card.lose-r{animation:loseR .4s ease-in forwards}
+@keyframes inL{from{transform:translateX(-115%);opacity:0}to{transform:none;opacity:1}}
+@keyframes inR{from{transform:translateX(115%);opacity:0}to{transform:none;opacity:1}}
+@keyframes win{35%{transform:scale(1.04);filter:drop-shadow(0 0 22px var(--glow))}to{transform:scale(.96);opacity:0}}
+@keyframes loseL{to{transform:translateX(-120%);opacity:0}}
+@keyframes loseR{to{transform:translateX(120%);opacity:0}}
+
+/* ---------- финал ---------- */
+#screen-final{overflow-y:auto;max-width:none;-webkit-overflow-scrolling:touch}
+.final{width:100%;max-width:520px;margin:0 auto;padding:calc(26px + env(safe-area-inset-top)) 20px calc(32px + env(safe-area-inset-bottom));text-align:center}
+.final h2{font-weight:800;font-size:min(12vw,58px);line-height:1;letter-spacing:.04em;color:#EAFDFF;text-shadow:0 0 6px rgba(34,229,255,.9),0 0 24px rgba(34,229,255,.6),0 0 52px rgba(34,229,255,.4)}
+.final .sub{font-weight:600;font-size:14px;letter-spacing:.14em;color:var(--muted);margin:12px 0 26px}
+.winner{display:flex;gap:18px;text-align:left;align-items:flex-start;--c:var(--cyan);--glow:rgba(34,229,255,.55)}
+.winner .poster{width:min(42vw,200px);height:auto;max-width:none}
+.winner .info{justify-content:flex-start;padding-top:2px;gap:8px}
+.winner .title{font-size:clamp(22px,6.4vw,34px);-webkit-line-clamp:5}
+.kp{align-self:flex-start;display:inline-flex;align-items:baseline;gap:8px;margin-top:6px;padding:6px 14px;border:1px solid var(--pink);border-radius:10px;box-shadow:0 0 14px rgba(255,61,218,.35)}
+.kp b{font-weight:800;font-size:28px;line-height:1;color:var(--pink);text-shadow:0 0 12px rgba(255,61,218,.7)}
+.kp small{font-size:13px;color:var(--muted)}
+.votes{font-size:14px;color:var(--muted)}
+.panel{margin-top:26px;border:1px solid var(--line);border-radius:14px;background:var(--surface);padding:18px;text-align:left}
+.stat-row{display:flex;align-items:center;gap:16px}
+.stat-row .pct{font-weight:800;font-size:42px;letter-spacing:-.02em;line-height:1;color:var(--cyan);text-shadow:0 0 14px rgba(34,229,255,.6)}
+.stat-row p{font-size:15px;line-height:1.35;color:var(--muted)}
+.stat-row b{color:var(--text);font-weight:600}
+.track{margin-top:14px;height:4px;background:var(--line);border-radius:4px}
+.track i{display:block;height:100%;width:0;border-radius:4px;background:var(--cyan);box-shadow:0 0 10px var(--cyan);transition:width 1s cubic-bezier(.2,.8,.2,1) .25s}
+.ach{margin-top:16px;display:flex;gap:16px;align-items:center;border:1px solid rgba(255,61,218,.55);border-radius:14px;background:var(--surface);padding:18px;text-align:left;box-shadow:0 0 22px rgba(255,61,218,.18),inset 0 0 18px rgba(255,61,218,.06)}
+.medal{flex:none;width:56px;height:56px;filter:drop-shadow(0 0 8px rgba(255,61,218,.8))}
+.ach .lbl{font-size:12px;letter-spacing:.14em;color:var(--muted);margin-bottom:4px}
+.ach h3{font-weight:800;font-size:20px;line-height:1.15;color:var(--pink);text-shadow:0 0 12px rgba(255,61,218,.55)}
+.ach p{font-size:14px;line-height:1.45;margin-top:6px;color:var(--muted)}
+.actions{margin-top:28px;display:flex;flex-direction:column;gap:12px;align-items:stretch}
+.actions .btn{width:100%}
+.actions .alt{background:transparent;color:var(--text);border-color:var(--line);box-shadow:none;text-shadow:none}
+.actions .alt:active{background:rgba(255,255,255,.06)}
+.history{margin-top:20px;font-size:13px;color:var(--muted)}
+.toast{
+  position:fixed;left:50%;top:calc(64px + env(safe-area-inset-top));transform:translate(-50%,-16px);opacity:0;z-index:20;max-width:calc(100% - 40px);text-align:center;
+  background:var(--surface);color:var(--text);font-weight:600;font-size:14px;padding:10px 18px;border:1px solid var(--cyan);border-radius:999px;
+  box-shadow:0 0 14px rgba(34,229,255,.4);transition:.25s;pointer-events:none;
+}
+.toast.show{transform:translate(-50%,0);opacity:1}
+
+/* ---------- широкие экраны: карточки рядом ---------- */
+@media (min-width:760px) and (min-height:640px){
+  .ring{flex-direction:row;gap:56px;padding:28px 28px 32px}
+  .fighter{flex-direction:column;align-items:center}
+  .card,.fighter.r .card{flex-direction:column;gap:16px;align-items:center}
+  .poster{height:auto;flex:1;min-height:0;max-width:none;width:auto;align-self:center;max-height:100%}
+  .info{flex:none;align-items:flex-start;width:100%;max-width:300px}
+  .fighter.r .skip,.skip{align-self:center}
+  .screen{max-width:900px}
+}
+@media (max-height:640px) and (max-width:759px){
+  .title{font-size:clamp(19px,6vw,26px)}
+  .ring{gap:22px;padding-top:10px}
+  .skip{font-size:13px;padding:6px 12px}
+  .meta,.years{font-size:13px}
+  .vs{width:44px;height:44px;margin:-22px 0 0 -22px;font-size:12px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- СТАРТ -->
+  <section id="screen-start" class="screen" aria-labelledby="logo">
+    <h1 class="logo" id="logo">
+      <span class="k">КИНО</span>
+      <span class="v">ВЕРСУС</span>
+    </h1>
+    <div class="rules">
+      <p>Две карточки — выбери ту, что нравится больше.</p>
+      <p>Не смотрел? Жми <b>«не смотрел :(»</b> — выйдет другой претендент.</p>
+      <p>Твой выбор проходит в следующий раунд. Так до финала.</p>
+    </div>
+    <button class="btn" id="btn-start" type="button">Начать баттл</button>
+    <p class="start-note" id="start-note"></p>
+  </section>
+
+  <!-- БАТТЛ -->
+  <section id="screen-battle" class="screen" hidden>
+    <header class="hud">
+      <span class="brand">КИНОВЕРСУС</span>
+      <span class="round" id="round" aria-live="polite">Раунд 1</span>
+      <div class="bar" aria-hidden="true"><i id="bar"></i></div>
+    </header>
+    <div class="ring" id="ring">
+      <article class="fighter l" id="fighter-l"></article>
+      <div class="vs" aria-hidden="true">VS</div>
+      <article class="fighter r" id="fighter-r"></article>
+    </div>
+  </section>
+
+  <!-- ФИНАЛ -->
+  <section id="screen-final" class="screen" hidden>
+    <div class="final">
+      <h2>ЧЕМПИОН</h2>
+      <p class="sub">твоего вкуса</p>
+      <div class="winner">
+        <div class="poster" id="w-poster"><div class="ph"></div></div>
+        <div class="info">
+          <span class="years" id="w-years"></span>
+          <span class="title" id="w-title"></span>
+          <span class="meta" id="w-meta"></span>
+          <span class="kp"><b id="w-rating"></b><small>Кинопоиск</small></span>
+          <span class="votes" id="w-votes"></span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="stat-row">
+          <span class="pct" id="w-pct"></span>
+          <p>игроков тоже выбрали его <b>любимым</b></p>
+        </div>
+        <div class="track" aria-hidden="true"><i id="w-track"></i></div>
+      </div>
+
+      <div class="ach">
+        <svg class="medal" viewBox="0 0 64 64" aria-hidden="true">
+          <circle cx="32" cy="32" r="29" fill="none" stroke="#FF3DDA" stroke-width="2.5"/>
+          <circle cx="32" cy="32" r="22" fill="none" stroke="#FF3DDA" stroke-width="1" opacity=".5"/>
+          <path d="M32 15l4.9 10 11 1.6-8 7.8 1.9 11L32 40.1l-9.8 5.3 1.9-11-8-7.8 11-1.6z" fill="none" stroke="#FFEAFB" stroke-width="2.5" stroke-linejoin="round"/>
+        </svg>
+        <div>
+          <div class="lbl">Ачивка</div>
+          <h3 id="a-name"></h3>
+          <p id="a-desc"></p>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn" id="btn-again" type="button">Ещё баттл</button>
+        <button class="btn alt" id="btn-share" type="button">Поделиться</button>
+        <a class="btn alt" id="btn-kp" href="#" target="_blank" rel="noopener">Открыть на Кинопоиске</a>
+      </div>
+      <p class="history" id="history"></p>
+    </div>
+  </section>
+
+  <div class="toast" id="toast" role="status"></div>
+</div>
+
+<script src="data.js"></script>
+<script>
+(() => {
+  "use strict";
+  const FILMS = window.FILMS || [];
+  const $ = (id) => document.getElementById(id);
+  const screens = { start: $("screen-start"), battle: $("screen-battle"), final: $("screen-final") };
+  const slots = { l: $("fighter-l"), r: $("fighter-r") };
+
+  /* ---------- утилиты ---------- */
+  const shuffle = (a) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const fmtRating = (r) => r.toFixed(1).replace(".", ",");
+  const fmtVotes = (n) => n >= 1e6 ? (n / 1e6).toFixed(1).replace(".", ",") + " млн оценок" : n >= 1e3 ? Math.round(n / 1e3) + " тыс. оценок" : n + " оценок";
+  const fmtPct = (p) => String(p).replace(".", ",") + "%";
+  const localSrc = (f) => `images/${f.id}.webp`;
+  const cdnSrc = (f) => `${f.poster}/300x450`;
+  const primarySrc = (f) => (window.LOCAL_IMAGES ? localSrc(f) : cdnSrc(f));
+  const secondarySrc = (f) => (window.LOCAL_IMAGES ? cdnSrc(f) : localSrc(f));
+  const show = (name) => { for (const k in screens) screens[k].hidden = k !== name; };
+  let toastTimer;
+  const toast = (msg) => { const t = $("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("show"), 1800); };
+
+  // картинка: основной адрес -> запасной -> текстовая заглушка остаётся под ней
+  function loadPoster(poster, f, eager) {
+    const img = new Image();
+    img.alt = "";
+    img.decoding = "async";
+    img.referrerPolicy = "no-referrer";
+    if (!eager) img.loading = "lazy";
+    let step = 0;
+    img.onload = () => img.classList.add("on");
+    img.onerror = () => { if (step++ === 0) img.src = secondarySrc(f); else img.remove(); };
+    img.src = primarySrc(f);
+    poster.appendChild(img);
+  }
+  const preload = (f) => { if (f) { const i = new Image(); i.referrerPolicy = "no-referrer"; i.src = primarySrc(f); } };
+
+  /* ---------- турнир ----------
+     Раунд 1: претенденты берутся из пула (пропуск заменяет карточку новой).
+     Победитель каждой дуэли сохраняется и идёт в следующий раунд,
+     где выдаются две новые карточки. Раунды повторяются до одного чемпиона. */
+  let st;
+  const other = (s) => (s === "l" ? "r" : "l");
+  const stageName = (n) => n <= 2 ? "Финал" : n <= 4 ? "Полуфинал" : n <= 8 ? "Четвертьфинал" : n <= 16 ? "1/8 финала" : "1/16 финала";
+
+  function newGame() {
+    st = {
+      pool: shuffle(FILMS.map((_, i) => i)), // карточки, которых игрок ещё не видел
+      round: 1, queue: [], next: [],         // queue — участники раунда 2+, next — прошедшие дальше
+      L: null, R: null, chosen: new Set(),   // chosen — тайтлы, которые игрок уже выбирал
+      picks: 0, skips: 0, out: 0, locked: true, total: FILMS.length,
+      stage: stageName(FILMS.length),
+    };
+    show("battle");
+    if (deal()) { renderPair(); st.locked = false; }
+  }
+
+  // следующая карточка для текущего раунда
+  function draw() {
+    if (st.round === 1) return st.pool.length ? FILMS[st.pool.pop()] : null;
+    return st.queue.length ? st.queue.shift() : null;
+  }
+
+  // собирает новую пару; false — раунд закончился
+  function deal() {
+    const a = draw();
+    if (!a) return false;
+    let b = draw();
+    if (!b) {
+      // осталась одна лишняя карточка: она встречается с одним из победителей раунда
+      if (st.next.length) b = st.next.pop();
+      else { st.next.push(a); return false; }
+    }
+    [st.L, st.R] = Math.random() < 0.5 ? [a, b] : [b, a];
+    return true;
+  }
+
+  function renderPair() {
+    renderSlot("l", true); renderSlot("r", true);
+    updateHud();
+    (st.round === 1 ? st.pool.slice(-2).map((i) => FILMS[i]) : st.queue.slice(0, 2)).forEach(preload);
+  }
+
+  function renderSlot(side, anim) {
+    const f = st[side.toUpperCase()];
+    const seen = st.chosen.has(f.id); // уже выбирал — значит смотрел, кнопка скрыта
+    const el = slots[side];
+    el.innerHTML = `
+      <button class="card" type="button" aria-label="Выбрать: ${esc(f.title)}">
+        <span class="poster"><span class="ph">${esc(f.title)}</span></span>
+        <span class="info">
+          <span class="years">${esc(f.years)}</span>
+          <span class="title">${esc(f.title)}</span>
+          <span class="meta">${esc([f.country, f.genre].filter(Boolean).join(", "))}${f.director ? "<br>реж. " + esc(f.director) : ""}</span>
+        </span>
+      </button>
+      <button class="skip${seen ? " off" : ""}" type="button"${seen ? ' tabindex="-1" aria-hidden="true"' : ""}>не смотрел :(</button>`;
+    loadPoster(el.querySelector(".poster"), f, true);
+    const card = el.querySelector(".card");
+    if (anim) card.classList.add(side === "l" ? "in-l" : "in-r");
+    card.addEventListener("click", () => pick(side));
+    if (!seen) el.querySelector(".skip").addEventListener("click", () => skip(side));
+  }
+
+  function updateHud() {
+    $("round").textContent = st.stage;
+    $("bar").style.width = Math.round((st.out / Math.max(1, st.total - 1)) * 100) + "%";
+  }
+
+  const animateOut = (winSide) => {
+    slots[winSide].querySelector(".card").classList.add("win");
+    const ls = other(winSide);
+    slots[ls].querySelector(".card").classList.add(ls === "l" ? "lose-l" : "lose-r");
+  };
+
+  function pick(side) {
+    if (st.locked) return;
+    st.locked = true;
+    if (navigator.vibrate) navigator.vibrate(12);
+    const w = st[side.toUpperCase()];
+    st.chosen.add(w.id);  // выбор сохраняется: тайтл идёт в следующий раунд
+    st.next.push(w);
+    st.picks++; st.out++;
+    updateHud();
+    animateOut(side);
+    setTimeout(advance, 450);
+  }
+
+  function skip(side) {
+    if (st.locked) return;
+    const key = side.toUpperCase();
+    if (st.chosen.has(st[key].id)) return;
+    st.skips++; st.out++;
+    const rep = st.round === 1 && st.pool.length ? FILMS[st.pool.pop()] : null;
+    if (rep) { st[key] = rep; renderSlot(side, true); updateHud(); return; }
+    // заменить некем: соперник проходит дальше без боя
+    st.locked = true;
+    st.next.push(st[other(side).toUpperCase()]);
+    updateHud();
+    animateOut(other(side));
+    setTimeout(advance, 450);
+  }
+
+  function advance() {
+    if (deal()) { renderPair(); st.locked = false; } else nextRound();
+  }
+
+  function nextRound() {
+    let parts = st.next;
+    st.next = [];
+    if (!parts.length) return show("start");
+    if (parts.length === 1) return finish(parts[0]);
+    st.round++;
+    st.stage = stageName(parts.length);
+    parts = shuffle(parts);
+    if (parts.length % 2) {
+      // нечётное число участников: автопроход получает тайтл, который игрок уже выбирал
+      const i = parts.findIndex((f) => st.chosen.has(f.id));
+      const bye = parts.splice(i >= 0 ? i : 0, 1)[0];
+      st.next.push(bye);
+      toast(`«${bye.title}» проходит дальше без боя`);
+    }
+    st.queue = parts;
+    deal();
+    renderPair();
+    st.locked = false;
+  }
+
+  /* ---------- финал ---------- */
+  let champion = null;
+  function finish(f) {
+    champion = f;
+    const p = $("w-poster");
+    p.innerHTML = `<div class="ph">${esc(f.title)}</div>`;
+    loadPoster(p, f, true);
+    $("w-years").textContent = f.years;
+    $("w-title").textContent = f.title;
+    $("w-meta").textContent = [f.country, f.genre].filter(Boolean).join(", ");
+    $("w-rating").textContent = fmtRating(f.rating);
+    $("w-votes").textContent = fmtVotes(f.votes);
+    $("w-pct").textContent = fmtPct(f.share);
+    $("w-track").style.width = "0";
+    $("a-name").textContent = f.ach.n;
+    $("a-desc").textContent = f.ach.d;
+    $("btn-kp").href = f.url;
+    $("history").textContent = `Дуэлей сыграно: ${st.picks} · пропущено: ${st.skips}`;
+    show("final");
+    screens.final.scrollTop = 0;
+    // ширина полоски: масштабируем, чтобы 8% тоже было заметно
+    requestAnimationFrame(() => requestAnimationFrame(() => { $("w-track").style.width = Math.min(100, Math.max(4, f.share * 5)) + "%"; }));
+  }
+
+  async function share() {
+    if (!champion) return;
+    const text = `Мой чемпион в «Киноверсусе» — «${champion.title}». Моя ачивка: «${champion.ach.n}». А кто твой?`;
+    const url = location.href.split("#")[0];
+    if (navigator.share) {
+      try { await navigator.share({ title: "Киноверсус", text, url }); return; } catch (e) { if (e && e.name === "AbortError") return; }
+    }
+    try { await navigator.clipboard.writeText(text + " " + url); toast("Скопировано"); }
+    catch (e) { toast("Не удалось скопировать"); }
+  }
+
+  /* ---------- старт ---------- */
+  $("start-note").textContent = FILMS.length ? `Тайтлов в турнире: ${FILMS.length}` : "Нет данных: проверьте data.js";
+  $("btn-start").addEventListener("click", () => { if (FILMS.length >= 2) newGame(); });
+  $("btn-again").addEventListener("click", () => show("start"));
+  $("btn-share").addEventListener("click", share);
+  FILMS.slice(0, 2).forEach(preload);
+
+  // отладка / автотесты: ?debug в адресе
+  if (/[?&]debug/.test(location.search)) window.__kv = { get st() { return st; }, finish, newGame };
+})();
+</script>
+</body>
+</html>
